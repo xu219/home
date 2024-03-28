@@ -1,0 +1,122 @@
+#这个工作流将建立并推动一个新的容器形象到阿里巴巴云容器注册处(ACR),
+#然后将其部署到阿里巴巴云容器服务库伯内特斯,当有一个推动"发展"分支。
+#
+#使用此工作流程,您需要完成以下设置步骤:
+#
+#1创建一个ACR存储库来存储容器图像。
+#您可以使用ACREE实例来提高安全性和性能。
+#有关指示见HttPS://www.阿里巴巴卡努.com/帮助/文件说明/142168.HP
+#
+#2创建一个ack集群来运行您的容器化应用程序。
+#您可以使用MAKPro集群来提高安全性和性能。
+#有关指示见HttPS://www.ali巴卡告.com/帮助/文件说明/95108.HP
+#
+#3将你的副钥匙组合放在名为"连接"和"连接"的"键"动作秘密中。
+#有关建立秘密的说明请参阅:https://开发者。
+#
+#4更改区域、注册表、名称空间、图像、ack_集群_d和ack_部署_名称的值。
+#
+
+ 姓名                              : 建立和部署到AKK
+
+ 在…上                              :
+  推动                              :
+    分枝                              : [                               "dev"                               ]
+
+#此工作流中的所有作业和步骤都可以使用环境变量。
+ 环境                              :
+  地区性                              : 中国-杭州
+  注册处                             : registry.cn-hangzhou.aliyuncs.com
+  命名空间                            : 命名空间
+  形象                          : 雷波
+  标签                          : $ {                          { 沙沙 }                          }
+  群                          : 聚伞花序
+  名称                          : 新工具部署
+
+  自动登记系统                          : myregistry.cn-hangzhou.cr.aliyuncs.com
+  阿克_埃_实例                          : 典型的
+  空间空间                          : 命名空间
+  AC_EE_图像                          : 雷波
+  阿克_埃_标签                          : $ {                         { 沙沙 }                        }
+
+准许                        :
+  目录                     : 阅读
+
+乔布斯                 :
+  建造           :
+    逃跑          : 最新的
+    环境        : 生产
+
+    台阶    台阶   : :
+    -姓名 :Checkout
+      使用 :actions/checkout@v4
+
+    #1.1登入ACR#1.1登入ACR#1.1登入ACR#1.1登入ACR#1.1登入ACR#1.1登入ACR#1.1登入ACR#1.1登入ACR
+    -姓名:使用副钥匙对登录到ACR
+      使用 :aliyun/acr-login@v1
+      与…有关      与…有关      与…有关      与…有关      与…有关      与…有关      与…有关      与…有关      : : : : : : : :
+        区域的        区域的        区域的        区域的        区域的        区域的        区域的        区域的      : "${{ env.REGION_ID }}"    : "${{ env.REGION_ID }}" : "${{ env.REGION_ID }}"    : "${{ env.REGION_ID }}" : "${{ env.REGION_ID }}"    : "${{ env.REGION_ID }}" : "${{ env.REGION_ID }}"    : "${{ env.REGION_ID }}"
+        访问键标识        访问键标识        访问键标识        访问键标识        访问键标识        访问键标识        访问键标识        访问键标识     : "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}": "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}": "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}": "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}"
+        进入关键机密        进入关键机密        进入关键机密        进入关键机密        进入关键机密        进入关键机密        进入关键机密        进入关键机密     : "${{ secrets.ACCESS_KEY_SECRET }}"   : "${{ secrets.ACCESS_KEY_SECRET }}": "${{ secrets.ACCESS_KEY_SECRET }}"   : "${{ secrets.ACCESS_KEY_SECRET }}": "${{ secrets.ACCESS_KEY_SECRET }}"   : "${{ secrets.ACCESS_KEY_SECRET }}": "${{ secrets.ACCESS_KEY_SECRET }}"   : "${{ secrets.ACCESS_KEY_SECRET }}"
+
+    #1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR#1.2建立并将图像推至ACR
+    -姓名:将图像制作和推至ACR
+      跑      跑      跑      跑     : | : |: | : |
+        docker build --tag "$REGISTRY/$NAMESPACE/$IMAGE:$TAG" .
+        多克尔推"$注册表/$名称空间/$图像:$标签"
+
+    #1.3ACR扫描图像#1.3ACR扫描图像#1.3ACR扫描图像#1.3ACR扫描图像
+    -姓名:航空公司的扫描图像
+      使用 :aliyun/acr-scan@v1
+      与…有关      与…有关      与…有关      与…有关      : :: :
+        区域的        区域的        区域的        区域的      : "${{ env.REGION_ID }}"   : "${{ env.REGION_ID }}": "${{ env.REGION_ID }}"   : "${{ env.REGION_ID }}"
+        访问键标识        访问键标识        访问键标识        访问键标识      : "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}": "${{ secrets.ACCESS_KEY_ID }}"   : "${{ secrets.ACCESS_KEY_ID }}"
+        进入关键机密        进入关键机密        进入关键机密        进入关键机密      : "${{ secrets.ACCESS_KEY_SECRET }}"  : "${{ secrets.ACCESS_KEY_SECRET }}": "${{ secrets.ACCESS_KEY_SECRET }}"  : "${{ secrets.ACCESS_KEY_SECRET }}"
+        储藏室        储藏室    : "${{ env.NAMESPACE }}/${{ env.IMAGE }}" : "${{ env.NAMESPACE }}/${{ env.IMAGE }}"
+        标签   : "${{ env.TAG }}"
+
+    #2.1(可选)登入ACREE
+    -使用 :actions/checkout@v3
+    -姓名 :Login to ACR EE with the AccessKey pair
+      使用 :aliyun/acr-login@v1
+      与…有关  :
+        登录服务器  : "https://${{ env.ACR_EE_REGISTRY }}"
+        区域的  : "${{ env.REGION_ID }}"
+        访问键标识  : "${{ secrets.ACCESS_KEY_ID }}"
+        进入关键机密  : "${{ secrets.ACCESS_KEY_SECRET }}"
+        典型的  : "${{ env.ACR_EE_INSTANCE_ID }}"
+
+    #2.2(可选)建立和推推图像ACREE
+    -姓名 :Build and push image to ACR EE
+      跑  : |
+        docker build -t "$ACR_EE_REGISTRY/$ACR_EE_NAMESPACE/$ACR_EE_IMAGE:$TAG" .
+        码头推推"$AC_EE_注册处/$AC_EE_名称空间/$AC_EE_图像:$标签"
+    #2.3(可选)ACREE扫描图像
+    - 姓名 :Scan image in ACR EE
+      使用 :aliyun/acr-scan@v1
+      与…有关 :
+        区域的 : "${{ env.REGION_ID }}"
+        访问键标识 : "${{ secrets.ACCESS_KEY_ID }}"
+        进入关键机密 : "${{ secrets.ACCESS_KEY_SECRET }}"
+        典型的 : "${{ env.ACR_EE_INSTANCE_ID }}"
+        储藏室 : "${{ env.ACR_EE_NAMESPACE}}/${{ env.ACR_EE_IMAGE }}"
+        标签 : "${{ env.ACR_EE_TAG }}"
+
+    #3.1设定适应措施背景
+    - 姓名  : 设置K8S上下文
+      使用  : 阿里/行动----背景@V1
+      与…有关  :
+        访问键标识  : "${{ secrets.ACCESS_KEY_ID }}"
+        进入关键机密  : "${{ secrets.ACCESS_KEY_SECRET }}"
+        集群的  : "${{ env.ACK_CLUSTER_ID }}"
+
+    #3.2将图像部署到MAK集群
+    - 姓名  : 建立库斯塔姆
+      跑  : | -
+        卷毛型  "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  |bash/发展/STIN3.8.6
+    - 姓名 :Deploy
+      跑 : |-
+        ./kustomize edit set image REGISTRY/NAMESPACE/IMAGE:TAG=$REGISTRY/$NAMESPACE/$IMAGE:$TAG
+        ./kustomize build . | kubectl apply -f -
+        kubectl rollout status deployment/$ACK_DEPLOYMENT_NAME
+        kubectl get services -o wide
